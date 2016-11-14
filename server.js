@@ -1,16 +1,17 @@
 /*jslint node: true, nomen: true, unparam: true, es5: true */
 
 'use strict';
-var express = require('express')
-var app = express()
-var http = require('http').Server(app)
-var io = require('socket.io')(http)
-var url = require('url')
-var shell = require('shelljs')
-var SensorTag = require('sensortag')
+var express = require('express');
+var app = express();
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
+var url = require('url');
+var shell = require('shelljs');
+var SensorTag = require('sensortag');
 
-var note = require('./modules/note')
-var drums = require('./modules/drums')
+var note = require('./modules/note');
+var drums = require('./modules/drums');
+var chordsInstrument = require("./modules/chords");
 
 var fork = require('child_process').fork,
     sequencerProcess = fork(__dirname + '/sequencer-process.js'),
@@ -149,7 +150,7 @@ var instruments = {
     '54d13c66942c4bc7a36e115b0259ed40': {
         name: 'chord',
         setup: function (sensorTag) {
-            // implement chords here
+            chordsInstrument(sensorTag);
         }
     }
 };
