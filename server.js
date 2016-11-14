@@ -46,7 +46,7 @@ app.use('/torsk.js', express.static(__dirname + '/torsk.js'));
 app.get('/', function (req, res) {
     var page = pages[pageCounter];
 
-    pageCounter = (pageCounter + 1) % 3;
+    pageCounter = (pageCounter + 1) % 4;
     res.sendFile(__dirname + page);
 });
 
