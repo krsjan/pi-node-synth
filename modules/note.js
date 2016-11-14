@@ -8,28 +8,20 @@ function play(note) {
 }
 
 module.exports = function (sensorTag) {
+    var checkInterval = setInterval(function () {
+        sensorTag.readLuxometer(function (error, lux) {
+            // success
+            console.log("Luxometer (" + sensorTag.id + "): " + lux);
 
-    sensorTag.enableLuxometer(function (error) {
-        if (error) {
-            console.log("Luxometer Error: " + error);
-        }
-
-        var checkInterval = setInterval(function () {
-            sensorTag.readLuxometer(function (error, lux) {
-                // success
-                console.log("Luxometer (" + sensorTag.id + "): " + lux);
-
-                if (lux < 10) {
-                    play('C');
-                } else {
-                    return;
-                }
-            });
-        }, 1000);
-
-        sensorTag.on('disconnect', function () {
-            clearInterval(checkInterval);
+            if (lux < 10) {
+                play('C');
+            } else {
+                return;
+            }
         });
+    }, 1000);
 
+    sensorTag.on('disconnect', function () {
+        clearInterval(checkInterval);
     });
 };
