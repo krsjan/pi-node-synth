@@ -1,14 +1,16 @@
 /*jslint node: true, nomen: true, unparam: true, es5: true */
 
 'use strict';
-var express = require('express'),
-    app = express(),
-    http = require('http').Server(app),
-    io = require('socket.io')(http),
-    url = require('url'),
-    shell = require('shelljs'),
+var express = require('express')
+var app = express()
+var http = require('http').Server(app)
+var io = require('socket.io')(http)
+var url = require('url')
+var shell = require('shelljs')
+var SensorTag = require('sensortag')
 
-    fork = require('child_process').fork,
+
+var fork = require('child_process').fork,
     sequencerProcess = fork(__dirname + '/sequencer-process.js'),
     arpeggiatorProcess = fork(__dirname + '/arpeggiator-process.js'),
     
@@ -122,3 +124,53 @@ app.get('/stop', function (req, res) {
 http.listen(port, function () {
     console.log('Synth started at http://localhost:' + port + '/');
 });
+
+var hasTag = false;
+
+function onDiscoverTag(sensorTag) {
+  console.log("Found sensor tag!" + sensorTag);
+  if (sensorTag.id !== '123cff34af9b48d3a25ab6b59c39894e')
+    return;
+  console.log("Connecting");
+
+  sensorTag.connectAndSetUp(function(error) {
+    if (error) {
+        console.log("Failed to set up sensor tag. :(")
+    }
+    else {
+        console.log("Connected to sensor tag!");
+
+        var checkInterval = null;
+
+        sensorTag.enableLuxometer(function(error) {
+            if (error) {
+                console.log("Luxometer Error: " + error);
+            }
+
+            checkInterval = setInterval(function() {
+                sensorTag.readLuxometer(function(error, lux) {
+                    // success
+                    console.log("Luxometer: " + lux);
+                    if (lux < 10) {
+                      sequencerProcess.send({
+                          pattern: [['kick'], ['snare'], ['kick'], ['kick'], ['snare'], [], [], []],
+                          start: true
+                      });
+                    }
+                    else {
+                      sequencerProcess.send({
+                          stop: true
+                      });
+                    }
+                });
+            }, 1000)
+        });
+
+        sensorTag.on('disconnect', function() {
+            clearInterval(checkInterval);
+        });
+    }
+  });
+}
+
+SensorTag.discoverAll(onDiscoverTag);
