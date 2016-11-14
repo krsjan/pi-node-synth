@@ -9,12 +9,14 @@ var url = require('url')
 var shell = require('shelljs')
 var SensorTag = require('sensortag')
 
+var note = require('./modules/note')
+var drums = require('./modules/drums')
 
 var fork = require('child_process').fork,
     sequencerProcess = fork(__dirname + '/sequencer-process.js'),
     chordSequencerProcess = fork(__dirname + '/chord-sequencer-process.js'),
     arpeggiatorProcess = fork(__dirname + '/arpeggiator-process.js'),
-    
+
     port = 3000,
     chords = {
         'C': ['C3', 'E4', 'G3'],
@@ -68,7 +70,7 @@ app.get('/sequence', function (req, res) {
     res.sendFile(__dirname + '/sequence.html');
 });
 
-io.on('connection', function (socket){
+io.on('connection', function (socket) {
     console.log('a user connected');
 
     socket.on('play', function (msg) {
@@ -147,50 +149,55 @@ http.listen(port, function () {
 
 var hasTag = false;
 
+var instruments = {
+    // Drum loop
+    '123cff34af9b48d3a25ab6b59c39894e': {
+        name: 'drums',
+        setup: function (sensorTag) {
+            drums(sensorTag);
+        }
+    },
+
+    // Something else?
+    '451e1aadcff143efbbdd51cae25a7d38': {
+        name: 'synth',
+        setup: function (sensorTag) {
+            note(sensorTag);
+        }
+    },
+    // Something else?
+    '54d13c66942c4bc7a36e115b0259ed40': {
+        name: 'chord',
+        setup: function (sensorTag) {
+            // implement chords here
+        }
+    }
+};
+
 function onDiscoverTag(sensorTag) {
-  console.log("Found sensor tag!" + sensorTag);
-  if (sensorTag.id !== '123cff34af9b48d3a25ab6b59c39894e')
-    return;
-  console.log("Connecting");
+    console.log("Found sensor tag!" + sensorTag);
 
-  sensorTag.connectAndSetUp(function(error) {
-    if (error) {
-        console.log("Failed to set up sensor tag. :(")
+    if (!instruments.hasOwnProperty(sensorTag.id)) {
+        return;
     }
-    else {
-        console.log("Connected to sensor tag!");
 
-        var checkInterval = null;
+    var instrument = instruments[sensorTag.id];
 
-        sensorTag.enableLuxometer(function(error) {
-            if (error) {
-                console.log("Luxometer Error: " + error);
-            }
+    console.log("This is an instrument " + instrument.name + "... connecting to it!");
 
-            checkInterval = setInterval(function() {
-                sensorTag.readLuxometer(function(error, lux) {
-                    // success
-                    console.log("Luxometer (" + sensorTag.id + "): " + lux);
-                    if (lux < 10) {
-                      sequencerProcess.send({
-                          pattern: [['kick'], ['snare'], ['kick'], ['kick'], ['snare'], [], [], []],
-                          start: true
-                      });
-                    }
-                    else {
-                      sequencerProcess.send({
-                          stop: true
-                      });
-                    }
-                });
-            }, 1000)
-        });
+    sensorTag.connectAndSetUp(function (error) {
+        if (error) {
+            console.log("Failed to set up sensor tag. :(")
+        }
+        else {
+            console.log("Connected to " + instrument.name);
 
-        sensorTag.on('disconnect', function() {
-            clearInterval(checkInterval);
-        });
-    }
-  });
+            var checkInterval = null;
+
+            instrument.setup(sensorTag);
+
+        }
+    });
 }
 
 SensorTag.discoverAll(onDiscoverTag);
