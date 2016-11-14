@@ -1,32 +1,29 @@
+
+var fork = require('child_process').fork;
+var sequencerProcess = fork('./sequencer-process.js');
+
 module.exports = function (sensorTag) {
-    sensorTag.enableLuxometer(function (error) {
-        if (error) {
-            console.log("Luxometer Error: " + error);
-        }
+    var checkInterval = setInterval(function () {
+        sensorTag.readLuxometer(function (error, lux) {
+            // success
+            if (lux < 10) {
+                console.log("Play the drums!");
+                sequencerProcess.send({
+                    pattern: [['kick'], ['snare'], ['kick'], ['kick'], ['snare'], [], [], []],
+                    start: true
+                });
+            }
+            else {
+                console.log("No drums for you! >:(");
+                sequencerProcess.send({
+                    stop: true
+                });
+            }
 
-        var checkInterval = setInterval(function () {
-            sensorTag.readLuxometer(function (error, lux) {
-                // success
-                console.log("Luxometer (" + sensorTag.id + "): " + lux);
-
-                if (lux < 10) {
-                    sequencerProcess.send({
-                        pattern: [['kick'], ['snare'], ['kick'], ['kick'], ['snare'], [], [], []],
-                        start: true
-                    });
-                }
-                else {
-                    sequencerProcess.send({
-                        stop: true
-                    });
-                }
-
-            });
-        }, 1000);
-
-        sensorTag.on('disconnect', function () {
-            clearInterval(checkInterval);
         });
+    }, 1000);
 
-    })
+    sensorTag.on('disconnect', function () {
+        clearInterval(checkInterval);
+    });
 };

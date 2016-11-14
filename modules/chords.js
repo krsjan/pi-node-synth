@@ -27,7 +27,6 @@ module.exports = function(tag){
 
     function listenAccelerometer(){
         tag.on("accelerometerChange", function(x, y, z){
-            console.log("Change!");
             if(diffMoreThan5(lastX, x)){
                 currentChord = "C";
             }
@@ -59,8 +58,6 @@ module.exports = function(tag){
 
     function diffMoreThan5(oldVal, newVal){
         var diff = Math.abs(oldVal - newVal);
-        if(diff > 2)
-            console.log(diff);
         return diff > 2;
     }
 };
