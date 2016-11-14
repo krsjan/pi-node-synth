@@ -8,6 +8,7 @@ function play(note) {
 }
 
 module.exports = function (sensorTag) {
+    // Better comment
     var checkInterval = setInterval(function () {
         sensorTag.readLuxometer(function (error, lux) {
             // success
