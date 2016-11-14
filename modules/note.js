@@ -1,35 +1,52 @@
-var shell = require('shelljs')
+const shell = require('shelljs')
 
-function play(note) {
+const PERIOD = 500;
 
-    var command = 'play -qn synth 2 pluck ' + note;
+var notes = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+
+function play(x, y, z) {
+
+    x = Math.abs(x) * 2000;
+    y = Math.abs(y) * 2000;
+    z = Math.abs(z) * 1000;
+
+    var command = 'play -n synth 3 sine ' + x + ' sine ' + y + ' sine ' + z + ' brownnoise';
     shell.exec(command, {async: true});
 
 }
 
-module.exports = function (sensorTag) {
+function run(sensorTag) {
 
-    sensorTag.enableLuxometer(function (error) {
+    sensorTag.enableAccelerometer(function (error) {
         if (error) {
-            console.log("Luxometer Error: " + error);
+            console.log("Accelerometer Error :", error);
         }
+    });
 
-        var checkInterval = setInterval(function () {
-            sensorTag.readLuxometer(function (error, lux) {
-                // success
-                console.log("Luxometer (" + sensorTag.id + "): " + lux);
+    sensorTag.setAccelerometerPeriod(PERIOD, function (error) {
+        console.log("Accelerometer Error :", error);
+    });
 
-                if (lux < 10) {
-                    play('C');
-                } else {
-                    return;
-                }
-            });
-        }, 1000);
+    setInterval(function () {
 
-        sensorTag.on('disconnect', function () {
-            clearInterval(checkInterval);
+        sensorTag.readAccelerometer(function (error, x, y, z) {
+            if (error) {
+                console.error(error);
+            }
+
+            play(x, y, z);
+
         });
 
+    }, PERIOD);
+
+    sensorTag.on('disconnect', function () {
+        clearInterval(checkInterval);
     });
+
+}
+
+
+module.exports = function (sensorTag) {
+    run(sensorTag);
 };

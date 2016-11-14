@@ -172,7 +172,6 @@ function onDiscoverTag(sensorTag) {
         else {
             console.log("Connected to " + instrument.name);
 
-            var checkInterval = null;
 
             instrument.setup(sensorTag);
 
