@@ -183,22 +183,32 @@ function onDiscoverTag(sensorTag) {
 
         var checkInterval = null;
 
+        sensorTag.enableGyroscope(function(error) {
+            if (error)
+              console.log("Accelerometer Error: " + error);
+        });
+
         sensorTag.enableLuxometer(function(error) {
             if (error) {
                 console.log("Luxometer Error: " + error);
             }
-
-            checkInterval = setInterval(function() {
-                sensorTag.readLuxometer(function(error, lux) {
-                    // success
-                    console.log("Luxometer (" + sensorTag.id + "): " + lux);
-
-                    instrument.callback(lux < 10);
-                });
-            }, 1000)
         });
 
+        checkInterval = setInterval(function() {
+            sensorTag.readLuxometer(function(error, lux) {
+                // success
+                console.log("Luxometer (" + sensorTag.id + "): " + lux);
+
+                instrument.callback(lux < 10);
+            });
+
+            sensorTag.readGyroscope(function(error, x, y, z) {
+              console.log("Read accelerometer (" + x + ", " + y + ", " + z + ")");
+            });
+        }, 1000)
+
         sensorTag.on('disconnect', function() {
+            console.log("Lost connection to " + instrument.name);
             clearInterval(checkInterval);
         });
     }
