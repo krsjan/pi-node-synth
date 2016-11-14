@@ -11,6 +11,7 @@ var SensorTag = require('sensortag')
 
 var note = require('./modules/note')
 var drums = require('./modules/drums')
+var commandingyoga = require('./modules/commandingyoga')
 
 var fork = require('child_process').fork,
     sequencerProcess = fork(__dirname + '/sequencer-process.js'),
@@ -151,24 +152,18 @@ var instruments = {
     // Drum loop
     '123cff34af9b48d3a25ab6b59c39894e': {
         name: 'drums',
-        setup: function (sensorTag) {
-            drums(sensorTag);
-        }
+        setup: drums
     },
 
     // Something else?
     '451e1aadcff143efbbdd51cae25a7d38': {
         name: 'synth',
-        setup: function (sensorTag) {
-            note(sensorTag);
-        }
+        setup: note
     },
     // Something else?
-    '54d13c66942c4bc7a36e115b0259ed40': {
-        name: 'chord',
-        setup: function (sensorTag) {
-            // implement chords here
-        }
+    '4d347c3817224dea92249daad8b10708': {
+        name: 'yoga',
+        setup: commandingyoga,
     }
 };
 
@@ -189,6 +184,7 @@ function onDiscoverTag(sensorTag) {
         }
         else {
             console.log("Connected to " + instrument.name);
+            shell.exec("say Connected to " + instrument.name, {async: false});
 
             var checkInterval = null;
 
