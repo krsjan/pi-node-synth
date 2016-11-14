@@ -127,18 +127,59 @@ http.listen(port, function () {
 
 var hasTag = false;
 
+var instruments = {
+    // Drum loop
+    '123cff34af9b48d3a25ab6b59c39894e': {
+        name: 'Drums',
+        callback: function(ifThisIsTrueStartElseStop) {
+            if (ifThisIsTrueStartElseStop) {
+                sequencerProcess.send({
+                    pattern: [['kick'], ['snare'], ['kick'], ['kick'], ['snare'], [], [], []],
+                    start: true
+                });
+            }
+            else {
+                sequencerProcess.send({
+                    stop: true
+                });
+            }
+        }
+    },
+
+    // Something else?
+    '4d347c3817224dea92249daad8b10708': {
+        name: 'Crashloop',
+        callback: function(ifThisIsTrueStartElseStop) {
+            if (ifThisIsTrueStartElseStop) {
+                sequencerProcess.send({
+                    pattern: [['hihat'], ['snare'], [], [], ['hihat'], ['snare'], [], []],
+                    start: true
+                });
+            }
+            else {
+                sequencerProcess.send({
+                    stop: true
+                });
+            }
+        }
+    }
+}
+
 function onDiscoverTag(sensorTag) {
   console.log("Found sensor tag!" + sensorTag);
-  if (sensorTag.id !== '123cff34af9b48d3a25ab6b59c39894e')
-    return;
-  console.log("Connecting");
 
+  if (!instruments.hasOwnProperty(sensorTag.id)) {
+    return;
+  }
+
+  var instrument = instruments[sensorTag.id];
+  console.log("This is an instrument " + instrument.name + "... connecting to it!");
   sensorTag.connectAndSetUp(function(error) {
     if (error) {
         console.log("Failed to set up sensor tag. :(")
     }
     else {
-        console.log("Connected to sensor tag!");
+        console.log("Connected to " + instrument.name);
 
         var checkInterval = null;
 
@@ -151,17 +192,8 @@ function onDiscoverTag(sensorTag) {
                 sensorTag.readLuxometer(function(error, lux) {
                     // success
                     console.log("Luxometer (" + sensorTag.id + "): " + lux);
-                    if (lux < 10) {
-                      sequencerProcess.send({
-                          pattern: [['kick'], ['snare'], ['kick'], ['kick'], ['snare'], [], [], []],
-                          start: true
-                      });
-                    }
-                    else {
-                      sequencerProcess.send({
-                          stop: true
-                      });
-                    }
+
+                    instrument.callback(lux < 10);
                 });
             }, 1000)
         });
