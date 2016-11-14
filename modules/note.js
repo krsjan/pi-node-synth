@@ -2,8 +2,6 @@ const shell = require('shelljs')
 
 const PERIOD = 500;
 
-var notes = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
-
 function play(x, y, z) {
 
     x = Math.abs(x) * 2000;
@@ -35,14 +33,10 @@ function run(sensorTag) {
             }
 
             play(x, y, z);
-
         });
 
     }, PERIOD);
 
-    sensorTag.on('disconnect', function () {
-        clearInterval(checkInterval);
-    });
 
 }
 

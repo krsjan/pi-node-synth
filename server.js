@@ -14,6 +14,7 @@ var drums = require('./modules/drums')
 
 var fork = require('child_process').fork,
     sequencerProcess = fork(__dirname + '/sequencer-process.js'),
+    chordSequencerProcess = fork(__dirname + '/chord-sequencer-process.js'),
     arpeggiatorProcess = fork(__dirname + '/arpeggiator-process.js'),
 
     port = 3000,
@@ -36,7 +37,7 @@ var fork = require('child_process').fork,
         [0, 0, 0, 0, 0]
     ],
     pageCounter = 0,
-    pages = ['/synth.html', '/chords.html', '/drums.html'];
+    pages = ['/synth.html', '/chords.html', '/drums.html', '/chord-sequencer.html'];
 
 app.use('/static', express.static(__dirname + '/node_modules'));
 app.use('/torsk.css', express.static(__dirname + '/torsk.css'));
@@ -45,7 +46,7 @@ app.use('/torsk.js', express.static(__dirname + '/torsk.js'));
 app.get('/', function (req, res) {
     var page = pages[pageCounter];
 
-    pageCounter = (pageCounter + 1) % 3;
+    pageCounter = (pageCounter + 1) % 4;
     res.sendFile(__dirname + page);
 });
 
@@ -59,6 +60,10 @@ app.get('/chords', function (req, res) {
 
 app.get('/drums', function (req, res) {
     res.sendFile(__dirname + '/drums.html');
+});
+
+app.get('/chord-sequencer', function (req, res) {
+    res.sendFile(__dirname + '/chord-sequencer.html');
 });
 
 app.get('/sequence', function (req, res) {
@@ -111,7 +116,22 @@ io.on('connection', function (socket) {
         });
     });
 
-    socket.on('disconnect', function () {
+    socket.on('playChordSequence', function (msg) {
+        var p = msg;
+
+        chordSequencerProcess.send({
+            pattern: p,
+            start: true
+        });
+    });
+
+    socket.on('stopChordSequence', function (msg) {
+        chordSequencerProcess.send({
+            stop: true
+        });
+    });
+
+    socket.on('disconnect', function() {
         console.log('a user disconnected');
     });
 });
@@ -126,8 +146,6 @@ app.get('/stop', function (req, res) {
 http.listen(port, function () {
     console.log('Synth started at http://localhost:' + port + '/');
 });
-
-var hasTag = false;
 
 var instruments = {
     // Drum loop
@@ -172,6 +190,21 @@ function onDiscoverTag(sensorTag) {
         else {
             console.log("Connected to " + instrument.name);
 
+
+            sensorTag.enableGyroscope(function(error) {
+                if (error)
+                  console.log("Accelerometer Error: " + error);
+            });
+
+            sensorTag.enableLuxometer(function(error) {
+                if (error) {
+                    console.log("Luxometer Error: " + error);
+                }
+            });
+
+            sensorTag.readGyroscope(function(error, x, y, z) {
+              console.log("Read accelerometer (" + x + ", " + y + ", " + z + ")");
+            });
 
             instrument.setup(sensorTag);
 
