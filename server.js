@@ -150,7 +150,7 @@ function onDiscoverTag(sensorTag) {
             checkInterval = setInterval(function() {
                 sensorTag.readLuxometer(function(error, lux) {
                     // success
-                    console.log("Luxometer: " + lux);
+                    console.log("Luxometer (" + sensorTag.id + "): " + lux);
                     if (lux < 10) {
                       sequencerProcess.send({
                           pattern: [['kick'], ['snare'], ['kick'], ['kick'], ['snare'], [], [], []],
