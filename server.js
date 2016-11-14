@@ -147,8 +147,6 @@ http.listen(port, function () {
     console.log('Synth started at http://localhost:' + port + '/');
 });
 
-var hasTag = false;
-
 var instruments = {
     // Drum loop
     '123cff34af9b48d3a25ab6b59c39894e': {
@@ -193,6 +191,21 @@ function onDiscoverTag(sensorTag) {
             console.log("Connected to " + instrument.name);
 
             var checkInterval = null;
+
+            sensorTag.enableGyroscope(function(error) {
+                if (error)
+                  console.log("Accelerometer Error: " + error);
+            });
+
+            sensorTag.enableLuxometer(function(error) {
+                if (error) {
+                    console.log("Luxometer Error: " + error);
+                }
+            });
+
+            sensorTag.readGyroscope(function(error, x, y, z) {
+              console.log("Read accelerometer (" + x + ", " + y + ", " + z + ")");
+            });
 
             instrument.setup(sensorTag);
 
