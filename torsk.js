@@ -57,6 +57,30 @@ var drums = function(){
     socket.emit('playDrumSequence', pattern);
 };
 
+var stopDrums = function () {
+    socket.emit('stopDrumSequence');
+};
+
+var chordSequence = function(){
+    var pattern = [[], [], [], [], [], [], [], []];
+    var notes = ['C', 'G', 'Am', 'F'];
+    for (var j = 0; j <= 7; j++){
+        for (var i = 0; i <= 3; i++){
+            var name = notes[i];
+            console.log(name+"-"+(j+1));
+            var checked = document.getElementById(name+"-"+(j+1)).checked;
+            if(checked){
+                pattern[j].push(notes[i]);
+            }
+        }
+    }
+    socket.emit('playChordSequence', pattern);
+};
+
+var stopChordSequence = function () {
+    socket.emit('stopChordSequence');
+};
+
 var toggleChecked = function (id) {
     var element = document.getElementById(id);
         checked = element.checked;
@@ -68,12 +92,4 @@ var toggleChecked = function (id) {
         element.checked = true;
         element.className = "active";
     };
-};
-
-var stopDrums = function () {
-    socket.emit('stopDrumSequence');
-};
-
-var toggleDrum = function (x, sound) {
-    var pattern = [[], [], [], [], [], [], [], []];
 };

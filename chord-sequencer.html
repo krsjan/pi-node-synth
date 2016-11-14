@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Drums | Torsk</title>
+    <script src="/static/fastclick/lib/fastclick.js"></script>
+    <script src="/static/socket.io-client/socket.io.js"></script>
+
+    <!-- CSS -->
+    <link href="/static/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+    <link href="torsk.css" rel="stylesheet">
+
+    <!-- JS -->
+    <script type="text/javascript" src="torsk.js"></script>
+</head>
+<body>
+<table>
+    <tr onclick="chordSequence()">
+        <td id="C-1" onclick="toggleChecked('C-1')" style="background-color: lightblue;" class="inactive">&nbsp</td>
+        <td id="C-2" onclick="toggleChecked('C-2')" style="background-color: lightblue;" class="inactive">&nbsp</td>
+        <td id="C-3" onclick="toggleChecked('C-3')" style="background-color: lightblue;" class="inactive">&nbsp</td>
+        <td id="C-4" onclick="toggleChecked('C-4')" style="background-color: lightblue;" class="inactive">&nbsp</td>
+        <td id="C-5" onclick="toggleChecked('C-5')" style="background-color: lightblue;" class="inactive">&nbsp</td>
+        <td id="C-6" onclick="toggleChecked('C-6')" style="background-color: lightblue;" class="inactive">&nbsp</td>
+        <td id="C-7" onclick="toggleChecked('C-7')" style="background-color: lightblue;" class="inactive">&nbsp</td>
+        <td id="C-8" onclick="toggleChecked('C-8')" style="background-color: lightblue;" class="inactive">&nbsp</td>
+    </tr>
+    <tr onclick="chordSequence()">
+        <td id="G-1" onclick="toggleChecked('G-1')" style="background-color: violet;" class="inactive">&nbsp</td>
+        <td id="G-2" onclick="toggleChecked('G-2')" style="background-color: violet;" class="inactive">&nbsp</td>
+        <td id="G-3" onclick="toggleChecked('G-3')" style="background-color: violet;" class="inactive">&nbsp</td>
+        <td id="G-4" onclick="toggleChecked('G-4')" style="background-color: violet;" class="inactive">&nbsp</td>
+        <td id="G-5" onclick="toggleChecked('G-5')" style="background-color: violet;" class="inactive">&nbsp</td>
+        <td id="G-6" onclick="toggleChecked('G-6')" style="background-color: violet;" class="inactive">&nbsp</td>
+        <td id="G-7" onclick="toggleChecked('G-7')" style="background-color: violet;" class="inactive">&nbsp</td>
+        <td id="G-8" onclick="toggleChecked('G-8')" style="background-color: violet;" class="inactive">&nbsp</td>
+    </tr>
+    <tr onclick="chordSequence()">
+        <td id="Am-1" onclick="toggleChecked('Am-1')" style="background-color: lightgray;" class="inactive">&nbsp</td>
+        <td id="Am-2" onclick="toggleChecked('Am-2')" style="background-color: lightgray;" class="inactive">&nbsp</td>
+        <td id="Am-3" onclick="toggleChecked('Am-3')" style="background-color: lightgray;" class="inactive">&nbsp</td>
+        <td id="Am-4" onclick="toggleChecked('Am-4')" style="background-color: lightgray;" class="inactive">&nbsp</td>
+        <td id="Am-5" onclick="toggleChecked('Am-5')" style="background-color: lightgray;" class="inactive">&nbsp</td>
+        <td id="Am-6" onclick="toggleChecked('Am-6')" style="background-color: lightgray;" class="inactive">&nbsp</td>
+        <td id="Am-7" onclick="toggleChecked('Am-7')" style="background-color: lightgray;" class="inactive">&nbsp</td>
+        <td id="Am-8" onclick="toggleChecked('Am-8')" style="background-color: lightgray;" class="inactive">&nbsp</td>
+    </tr>
+    <tr onclick="chordSequence()">
+        <td id="F-1" onclick="toggleChecked('F-1')" style="background-color: lightpink;" class="inactive">&nbsp</td>
+        <td id="F-2" onclick="toggleChecked('F-2')" style="background-color: lightpink;" class="inactive">&nbsp</td>
+        <td id="F-3" onclick="toggleChecked('F-3')" style="background-color: lightpink;" class="inactive">&nbsp</td>
+        <td id="F-4" onclick="toggleChecked('F-4')" style="background-color: lightpink;" class="inactive">&nbsp</td>
+        <td id="F-5" onclick="toggleChecked('F-5')" style="background-color: lightpink;" class="inactive">&nbsp</td>
+        <td id="F-6" onclick="toggleChecked('F-6')" style="background-color: lightpink;" class="inactive">&nbsp</td>
+        <td id="F-7" onclick="toggleChecked('F-7')" style="background-color: lightpink;" class="inactive">&nbsp</td>
+        <td id="F-8" onclick="toggleChecked('F-8')" style="background-color: lightpink;" class="inactive">&nbsp</td>
+    </tr>
+    <tr>
+        <td colspan="4" onclick="chordSequence()" style="text-align: center; background-color: lightblue;"><b>:-)</b></td>
+        <td colspan="4" onclick="stopChordSequence()" style="text-align: center; background-color: lightcoral;"><b>:-/</b></td>
+    </tr>
+</table>
+</body>
+</html>
