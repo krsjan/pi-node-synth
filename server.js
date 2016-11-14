@@ -1,16 +1,19 @@
 /*jslint node: true, nomen: true, unparam: true, es5: true */
 
 'use strict';
-var express = require('express')
-var app = express()
-var http = require('http').Server(app)
-var io = require('socket.io')(http)
-var url = require('url')
-var shell = require('shelljs')
-var SensorTag = require('sensortag')
 
-var note = require('./modules/note')
-var drums = require('./modules/drums')
+
+var express = require('express');
+var app = express();
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
+var url = require('url');
+var shell = require('shelljs');
+var SensorTag = require('sensortag');
+
+var note = require('./modules/note');
+var drums = require('./modules/drums');
+var chordsInstrument = require("./modules/chords");
 var commandingyoga = require('./modules/commandingyoga')
 
 var fork = require('child_process').fork,
@@ -164,10 +167,16 @@ var instruments = {
     '4d347c3817224dea92249daad8b10708': {
         name: 'yoga',
         setup: commandingyoga,
+    },
+
+    '54d13c66942c4bc7a36e115b0259ed40': {
+        name: 'chord',
+        setup: chordsInstrument(sensorTag)
     }
 };
 
 function onDiscoverTag(sensorTag) {
+
     console.log("Found sensor tag!" + sensorTag);
 
     if (!instruments.hasOwnProperty(sensorTag.id)) {
@@ -185,23 +194,6 @@ function onDiscoverTag(sensorTag) {
         else {
             console.log("Connected to " + instrument.name);
             shell.exec("say Connected to " + instrument.name, {async: false});
-
-            var checkInterval = null;
-
-            sensorTag.enableGyroscope(function(error) {
-                if (error)
-                  console.log("Accelerometer Error: " + error);
-            });
-
-            sensorTag.enableLuxometer(function(error) {
-                if (error) {
-                    console.log("Luxometer Error: " + error);
-                }
-            });
-
-            sensorTag.readGyroscope(function(error, x, y, z) {
-              console.log("Read accelerometer (" + x + ", " + y + ", " + z + ")");
-            });
 
             instrument.setup(sensorTag);
 
